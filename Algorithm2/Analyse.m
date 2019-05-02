@@ -109,6 +109,7 @@ in_data = Awaraging(in_data, average);
 step = get(handles.popupmenu_step,'Value');
 switch step
     case 1
+        % add extra points between every pair of origin points
         in_data_step1(1:2*size(in_data,1)-1, 7) = 0;
         for i = 1:size(in_data,1)
             in_data_step1(2*i-1, :) = in_data(i, :);
@@ -117,6 +118,10 @@ switch step
             in_data_step1(2*i, :) = (in_data(i, :) + in_data(i+1, :)) ./ 2;
         end
         in_data = in_data_step1;
+        
+        % swing phase at 50 sec
+        in_data(2:size(in_data,1),5:7) = in_data(1:size(in_data,1)-1,5:7); 
+        
         stepStr = '50 sec';
     case 2
         stepStr = '100 sec';
