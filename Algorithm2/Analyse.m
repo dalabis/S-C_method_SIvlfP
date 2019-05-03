@@ -193,12 +193,23 @@ for ii = 1:length(t)-1
                 for m = 1:y
                     R0 = R1_minimize + dR_minimize*(k-1);
                     h0 = h1_minimize + dh_minimize*(m-1);
-                    [~, ~, S] = Z_leastsquare(R0, h0, B, 0);
+                    [~, ~, S] = Z_third_hop(R0, h0, B);
                     G1(k,m) = sum(S);
                 end
             end
             
         elseif Algorithm == 3
+            
+            for k = 1:x
+                for m = 1:y
+                    R0 = R1_minimize + dR_minimize*(k-1);
+                    h0 = h1_minimize + dh_minimize*(m-1);
+                    [~, ~, S] = Z_leastsquare(R0, h0, B, 0);
+                    G1(k,m) = sum(S);
+                end
+            end
+            
+        elseif Algorithm == 4
             
             for k = 1:x
                 for m = 1:y
