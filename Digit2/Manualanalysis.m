@@ -326,12 +326,12 @@ files = dir(directory);
 
 N = get(handles.uitable3, 'Data');
 i = str2num(get(handles.edit4, 'String'));
-im = imread(files(N(i)).name);
+im = imread([directory, '\', files(N(i)).name]);
 imshow(im)
 coord(size(im,1), size(im,2))
 
 trashhold = get(handles.Trashslider, 'Value');
-[ A, P ] = Analysis( files(N(i)).name, trashhold );
+[ A, P ] = Analysis([directory, '\', files(N(i)).name], trashhold);
 value(A, P, size(im,1), size(im,2))
 
 set(handles.uitable1, 'Data', A)
