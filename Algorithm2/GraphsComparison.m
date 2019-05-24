@@ -1,4 +1,4 @@
-function GraphsComparison(T1, T2, in_data, data_out, GG, stepStr)
+function GraphsComparison(T1, T2, in_data, data_out, GG, stepStr, units)
 %UNTITLED Summary of this function goes here
 %   Detailed explanation goes here
 
@@ -22,8 +22,13 @@ plot(data_out(:,1),abs(W_f1_back)/abs(W_f1_back(length(W_f1_back))),'color','r',
 xlim([data_out(1,1) data_out(end,1)])
 YLim(1,:) = get(gca,'YLim');
 G1 = gca;
-XTick = fix(data_out(1,1)*24):1:fix(data_out(end,1)*24);
-set(gca,'Xtick',XTick./24,'XTickLabel',datestr(XTick./24,'HH'))
+switch units
+    case 1
+        XTick = fix(data_out(1,1)*24):1:fix(data_out(end,1)*24);
+        set(gca,'Xtick',XTick./24,'XTickLabel',datestr(XTick./24,'HH'))
+    case 2
+        
+end
 grid on
 xlabel('UT, hours')
 ylabel('Ampl, 10.2kHz')
@@ -39,8 +44,13 @@ plot(data_out(:,1),abs(W_f2_back)/abs(W_f2_back(length(W_f2_back))),'color','r',
 xlim([data_out(1,1) data_out(end,1)])
 YLim(2,:) = get(gca,'YLim');
 G2 = gca;
-XTick = fix(data_out(1,1)*24):1:fix(data_out(end,1)*24);
-set(gca,'Xtick',XTick./24,'XTickLabel',datestr(XTick./24,'HH'))
+switch units
+    case 1
+        XTick = fix(data_out(1,1)*24):1:fix(data_out(end,1)*24);
+        set(gca,'Xtick',XTick./24,'XTickLabel',datestr(XTick./24,'HH'))
+    case 2
+        
+end
 grid on
 xlabel('UT, hours')
 ylabel('Ampl, 12.1kHz')
@@ -54,8 +64,13 @@ plot(data_out(:,1),abs(W_f3_back)/abs(W_f3_back(length(W_f3_back))),'color','r',
 xlim([data_out(1,1) data_out(end,1)])
 YLim(3,:) = get(gca,'YLim');
 G3 = gca;
-XTick = fix(data_out(1,1)*24):1:fix(data_out(end,1)*24);
-set(gca,'Xtick',XTick./24,'XTickLabel',datestr(XTick./24,'HH'))
+switch units
+    case 1
+        XTick = fix(data_out(1,1)*24):1:fix(data_out(end,1)*24);
+        set(gca,'Xtick',XTick./24,'XTickLabel',datestr(XTick./24,'HH'))
+    case 2
+        
+end
 grid on
 xlabel('UT, hours')
 ylabel('Ampl, 13.6kHz')
@@ -69,8 +84,13 @@ plot(data_out(:,1),(angle(W_f1_back)-angle(W_f1_back(length(W_f1_back))))*10^(6)
 xlim([data_out(1,1) data_out(end,1)])
 YLim(4,:) = get(gca,'YLim');
 G4 = gca;
-XTick = fix(data_out(1,1)*24):1:fix(data_out(end,1)*24);
-set(gca,'Xtick',XTick./24,'XTickLabel',datestr(XTick./24,'HH'))
+switch units
+    case 1
+        XTick = fix(data_out(1,1)*24):1:fix(data_out(end,1)*24);
+        set(gca,'Xtick',XTick./24,'XTickLabel',datestr(XTick./24,'HH'))
+    case 2
+        
+end
 grid on
 xlabel('UT, hours')
 ylabel('Phase, 10.2kHz')
@@ -84,8 +104,13 @@ plot(data_out(:,1),(angle(W_f2_back)-angle(W_f2_back(length(W_f2_back))))*10^(6)
 xlim([data_out(1,1) data_out(end,1)])
 YLim(5,:) = get(gca,'YLim');
 G5 = gca;
-XTick = fix(data_out(1,1)*24):1:fix(data_out(end,1)*24);
-set(gca,'Xtick',XTick./24,'XTickLabel',datestr(XTick./24,'HH'))
+switch units
+    case 1
+        XTick = fix(data_out(1,1)*24):1:fix(data_out(end,1)*24);
+        set(gca,'Xtick',XTick./24,'XTickLabel',datestr(XTick./24,'HH'))
+    case 2
+        
+end
 grid on
 xlabel('UT, hours')
 ylabel('Phase, 12.1kHz')
@@ -99,8 +124,13 @@ plot(data_out(:,1),(angle(W_f3_back)-angle(W_f3_back(length(W_f3_back))))*10^(6)
 xlim([data_out(1,1) data_out(end,1)])
 YLim(6,:) = get(gca,'YLim');
 G6 = gca;
-XTick = fix(data_out(1,1)*24):1:fix(data_out(end,1)*24);
-set(gca,'Xtick',XTick./24,'XTickLabel',datestr(XTick./24,'HH'))
+switch units
+    case 1
+        XTick = fix(data_out(1,1)*24):1:fix(data_out(end,1)*24);
+        set(gca,'Xtick',XTick./24,'XTickLabel',datestr(XTick./24,'HH'))
+    case 2
+        
+end
 grid on
 xlabel('UT, hours')
 ylabel('Phase, 13.6kHz')

@@ -22,7 +22,7 @@ function varargout = Analyse(varargin)
 
 % Edit the above text to modify the response to help Analyse
 
-% Last Modified by GUIDE v2.5 24-Jan-2019 19:47:03
+% Last Modified by GUIDE v2.5 24-May-2019 14:20:41
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -98,9 +98,17 @@ h2_minimize = str2double(get(handles.h2_minimize,'String'));
 dR_minimize = str2double(get(handles.dR_txt,'String'));
 dh_minimize = str2double(get(handles.dh_txt,'String'));
 
+in_data = xlsread(filename);
 % correct the data
 cd D:\VLF_DATABASE\General;
-in_data = Correct(xlsread(filename));
+units = get(handles.popupmenu7,'Value');
+in_data = Correct(in_data);
+switch units
+    case 1
+        
+    case 2
+        in_data = TimeToZenithAngle(in_data);
+end
 cd D:\VLF_DATABASE\Algorithm2;
 
 % averaging over 3, 7, 9 points with step 100 sec
@@ -342,8 +350,8 @@ set(handles.result_table,'Data',data_out)
 newfilename = strrep(filename, '_DATA.xls', '_RESULT.xls');
 set(handles.save_txt,'String',newfilename)
 
-GraphsResult(T1, T2, data_out, stepStr)
-GraphsComparison(T1, T2, in_data, data_out, GG, stepStr)
+GraphsResult(data_out, stepStr, units)
+GraphsComparison(T1, T2, in_data, data_out, GG, stepStr, units)
 
 function R1_minimize_Callback(hObject, eventdata, handles)
 % hObject    handle to R1_minimize (see GCBO)
@@ -683,8 +691,16 @@ for i = 1 : length(dir1Files)
 end
 filename = [dir1, '\', name{popUpMenuValue}, '\', name{popUpMenuValue}, '_DATA', '.xls'];
 
+in_data = xlsread(filename);
 cd D:\VLF_DATABASE\General;
-in_data = Correct(xlsread(filename));
+units = get(handles.popupmenu7,'Value');
+in_data = Correct(in_data);
+switch units
+    case 1
+        
+    case 2
+        in_data = TimeToZenithAngle(in_data);
+end
 cd D:\VLF_DATABASE\Algorithm2;
 %Поскольку формат номера серийных номеров между Excel и Matlab отличается,
 %вы должны добавить смещение 693960 к полученным номерам от xlsread.
@@ -717,49 +733,79 @@ end
 %лишние отсчеты убираются, чтобы обеспечить выбранный временной шаг
 step = get(handles.popupmenu_step,'Value');
 switch step
-    case 2
-        for i = 1:2:size(in_data,1)
-            in_data_step2(fix(i/2)+1,:) = in_data(i,:);
+    case 1
+        % add extra points between every pair of origin points
+        in_data_step1(1:2*size(in_data,1)-1, 7) = 0;
+        for i = 1:size(in_data,1)
+            in_data_step1(2*i-1, :) = in_data(i, :);
         end
-        in_data = in_data_step2;
+        for i = 1 : size(in_data, 1) - 1
+            in_data_step1(2*i, :) = (in_data(i, :) + in_data(i+1, :)) ./ 2;
+        end
+        in_data = in_data_step1;
+        
+        % swing phase at 50 sec
+        in_data(2:size(in_data,1),5:7) = in_data(1:size(in_data,1)-1,5:7); 
+        
+        stepStr = '50 sec';
+    case 2
+        stepStr = '100 sec';
     case 3
-        for i = 1:3:size(in_data,1)
-            in_data_step3(fix(i/3)+1,:) = in_data(i,:);
+        for i = 1:2:size(in_data,1)
+            in_data_step3(fix(i/2)+1,:) = in_data(i,:);
         end
         in_data = in_data_step3;
+        stepStr = '200 sec';
     case 4
-        for i = 1:6:size(in_data,1)
-            in_data_step4(fix(i/6)+1,:) = in_data(i,:);
+        for i = 1:3:size(in_data,1)
+            in_data_step4(fix(i/3)+1,:) = in_data(i,:);
         end
         in_data = in_data_step4;
+        stepStr = '5 min';
     case 5
-        for i = 1:12:size(in_data,1)
-            in_data_step5(fix(i/12)+1,:) = in_data(i,:);
+        for i = 1:6:size(in_data,1)
+            in_data_step5(fix(i/6)+1,:) = in_data(i,:);
         end
         in_data = in_data_step5;
+        stepStr = '10 min';
     case 6
-        for i = 1:18:size(in_data,1)
-            in_data_step6(fix(i/18)+1,:) = in_data(i,:);
+        for i = 1:12:size(in_data,1)
+            in_data_step6(fix(i/12)+1,:) = in_data(i,:);
         end
         in_data = in_data_step6;
-end            
+        stepStr = '15 min';
+    case 7
+        for i = 1:18:size(in_data,1)
+            in_data_step7(fix(i/18)+1,:) = in_data(i,:);
+        end
+        in_data = in_data_step7;
+        stepStr = '30 min';
+end
 
 axes(handles.graph_amplitude)
 plot(in_data(:,1),in_data(:,2:4))
-xlim([in_data(1,1) in_data(size(in_data,1),1)])
-ylim([0 100])
+axis tight
 yLimAmp = get(gca,'YLim');
 XTick = fix(in_data(1,1)*24):1:fix(in_data(end,1)*24);
-set(gca,'Xtick',XTick./24,'XTickLabel',datestr(XTick./24,'HH'))
+switch units
+    case 1
+        set(gca,'Xtick',XTick./24,'XTickLabel',datestr(XTick./24,'HH'))
+    case 2
+        
+end
 grid on
 
 axes(handles.graph_phase)
 plot(in_data(:,1),in_data(:,5:7))
-xlim([in_data(1,1) in_data(size(in_data,1),1)])
-%ylim([0 20])
+axis tight
 yLimPhase = get(gca,'YLim');
 XTick = fix(in_data(1,1)*24):1:fix(in_data(end,1)*24);
-set(gca,'Xtick',XTick./24,'XTickLabel',datestr(XTick./24,'HH'))
+switch units
+    case 1
+        set(gca,'Xtick',XTick./24,'XTickLabel',datestr(XTick./24,'HH'))
+    case 2
+        
+end
 grid on
 
 %запись крайних значений промежутков обработки
@@ -817,6 +863,29 @@ function Diredit_CreateFcn(hObject, eventdata, handles)
 % handles    empty - handles not created until after all CreateFcns called
 
 % Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+% --- Executes on selection change in popupmenu7.
+function popupmenu7_Callback(hObject, eventdata, handles)
+% hObject    handle to popupmenu7 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: contents = cellstr(get(hObject,'String')) returns popupmenu7 contents as cell array
+%        contents{get(hObject,'Value')} returns selected item from popupmenu7
+
+
+% --- Executes during object creation, after setting all properties.
+function popupmenu7_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to popupmenu7 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: popupmenu controls usually have a white background on Windows.
 %       See ISPC and COMPUTER.
 if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor','white');
