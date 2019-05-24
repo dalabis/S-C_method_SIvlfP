@@ -99,7 +99,9 @@ dR_minimize = str2double(get(handles.dR_txt,'String'));
 dh_minimize = str2double(get(handles.dh_txt,'String'));
 
 % correct the data
+cd D:\VLF_DATABASE\General;
 in_data = Correct(xlsread(filename));
+cd D:\VLF_DATABASE\Algorithm2;
 
 % averaging over 3, 7, 9 points with step 100 sec
 average = get(handles.popupmenu_average,'Value');
@@ -681,7 +683,9 @@ for i = 1 : length(dir1Files)
 end
 filename = [dir1, '\', name{popUpMenuValue}, '\', name{popUpMenuValue}, '_DATA', '.xls'];
 
+cd D:\VLF_DATABASE\General;
 in_data = Correct(xlsread(filename));
+cd D:\VLF_DATABASE\Algorithm2;
 %Поскольку формат номера серийных номеров между Excel и Matlab отличается,
 %вы должны добавить смещение 693960 к полученным номерам от xlsread.
 %in_data(:,1) = in_data(:,1)+693960;
