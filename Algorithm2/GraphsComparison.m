@@ -1,4 +1,4 @@
-function GraphsComparison(T1, T2, in_data, data_out, GG, stepStr, units)
+function GraphsComparison(T1, T2, in_data, data_out, GG, stepStr, averageStr, units)
 %UNTITLED Summary of this function goes here
 %   Detailed explanation goes here
 
@@ -16,9 +16,8 @@ end
 subplot(2,3,1)
 hold on
 plot(in_data(T1:T2,1),in_data(T1:T2,2)/in_data(T1,2),'color','b','linestyle','-')
-plot(in_data(T1:T2,1),in_data(T1:T2,2)/in_data(T2,2),'color','r','linestyle','-')
 plot(data_out(:,1),abs(W_f1_forw)/abs(W_f1_forw(1)),'color','b','linestyle','--')
-plot(data_out(:,1),abs(W_f1_back)/abs(W_f1_back(length(W_f1_back))),'color','r','linestyle','--')
+plot(data_out(:,1),abs(W_f1_back)/abs(W_f1_back(end))*in_data(T2,2)/in_data(T1,2),'color','r','linestyle','--')
 xlim([data_out(1,1) data_out(end,1)])
 YLim(1,:) = get(gca,'YLim');
 G1 = gca;
@@ -33,14 +32,17 @@ grid on
 xlabel('UT, hours')
 ylabel('Ampl, 10.2kHz')
 % discription is on a first graph
-legend('experiment(pos.dir.)', 'experiment(neg.dir.)', ['theory(pos.dir.), G= ', num2str(GG(1))], ['theory(neg.dir.), G= ', num2str(GG(2))])
+legend(...
+        ['experiment, num of points ', num2str(size(in_data(T1:T2,:),1)), ' with time step ', stepStr, ' (', averageStr, ')'],...
+        ['theory (positive dir.), discrepancy fun. G= ', num2str(GG(1))],...
+        ['theory (negative dir.), discrepancy fun. G= ', num2str(GG(2))]...
+    )
 
 subplot(2,3,2)
 hold on
 plot(in_data(T1:T2,1),in_data(T1:T2,3)/in_data(T1,3),'color','b','linestyle','-')
-plot(in_data(T1:T2,1),in_data(T1:T2,3)/in_data(T2,3),'color','r','linestyle','-')
 plot(data_out(:,1),abs(W_f2_forw)/abs(W_f2_forw(1)),'color','b','linestyle','--')
-plot(data_out(:,1),abs(W_f2_back)/abs(W_f2_back(length(W_f2_back))),'color','r','linestyle','--')
+plot(data_out(:,1),abs(W_f2_back)/abs(W_f2_back(end))*in_data(T2,3)/in_data(T1,3),'color','r','linestyle','--')
 xlim([data_out(1,1) data_out(end,1)])
 YLim(2,:) = get(gca,'YLim');
 G2 = gca;
@@ -58,9 +60,8 @@ ylabel('Ampl, 12.1kHz')
 subplot(2,3,3)
 hold on
 plot(in_data(T1:T2,1),in_data(T1:T2,4)/in_data(T1,4),'color','b','linestyle','-')
-plot(in_data(T1:T2,1),in_data(T1:T2,4)/in_data(T2,4),'color','r','linestyle','-')
 plot(data_out(:,1),abs(W_f3_forw)/abs(W_f3_forw(1)),'color','b','linestyle','--')
-plot(data_out(:,1),abs(W_f3_back)/abs(W_f3_back(length(W_f3_back))),'color','r','linestyle','--')
+plot(data_out(:,1),abs(W_f3_back)/abs(W_f3_back(end))*in_data(T2,4)/in_data(T1,4),'color','r','linestyle','--')
 xlim([data_out(1,1) data_out(end,1)])
 YLim(3,:) = get(gca,'YLim');
 G3 = gca;
@@ -78,9 +79,8 @@ ylabel('Ampl, 13.6kHz')
 subplot(2,3,4)
 hold on
 plot(in_data(T1:T2,1),in_data(T1:T2,5)-in_data(T1,5),'color','b','linestyle','-')
-plot(in_data(T1:T2,1),in_data(T1:T2,5)-in_data(T2,5),'color','r','linestyle','-')
 plot(data_out(:,1),(angle(W_f1_forw)-angle(W_f1_forw(1)))*10^(6)/(2*pi*10.2*10^(3)),'color','b','linestyle','--')
-plot(data_out(:,1),(angle(W_f1_back)-angle(W_f1_back(length(W_f1_back))))*10^(6)/(2*pi*10.2*10^(3)),'color','r','linestyle','--')
+plot(data_out(:,1),(angle(W_f1_back)-angle(W_f1_back(end)))*10^(6)/(2*pi*10.2*10^(3))+in_data(T2,5)-in_data(T1,5),'color','r','linestyle','--')
 xlim([data_out(1,1) data_out(end,1)])
 YLim(4,:) = get(gca,'YLim');
 G4 = gca;
@@ -98,9 +98,8 @@ ylabel('Phase, 10.2kHz')
 subplot(2,3,5)
 hold on
 plot(in_data(T1:T2,1),in_data(T1:T2,6)-in_data(T1,6),'color','b','linestyle','-')
-plot(in_data(T1:T2,1),in_data(T1:T2,6)-in_data(T2,6),'color','r','linestyle','-')
-plot(data_out(:,1),(angle(W_f2_forw)-angle(W_f2_forw(1)))*10^(6)/(2*pi*12.1*10^(3)),'color','b','linestyle','--')
-plot(data_out(:,1),(angle(W_f2_back)-angle(W_f2_back(length(W_f2_back))))*10^(6)/(2*pi*10.2*10^(3)),'color','r','linestyle','--')
+plot(data_out(:,1),(angle(W_f2_forw)-angle(W_f2_forw(1)))*10^(6)/(2*pi*10.2*10^(3)),'color','b','linestyle','--')
+plot(data_out(:,1),(angle(W_f2_back)-angle(W_f2_back(end)))*10^(6)/(2*pi*10.2*10^(3))+in_data(T2,6)-in_data(T1,6),'color','r','linestyle','--')
 xlim([data_out(1,1) data_out(end,1)])
 YLim(5,:) = get(gca,'YLim');
 G5 = gca;
@@ -118,9 +117,8 @@ ylabel('Phase, 12.1kHz')
 subplot(2,3,6)
 hold on
 plot(in_data(T1:T2,1),in_data(T1:T2,7)-in_data(T1,7),'color','b','linestyle','-')
-plot(in_data(T1:T2,1),in_data(T1:T2,7)-in_data(T2,7),'color','r','linestyle','-')
-plot(data_out(:,1),(angle(W_f3_forw)-angle(W_f3_forw(1)))*10^(6)/(2*pi*13.6*10^(3)),'color','b','linestyle','--')
-plot(data_out(:,1),(angle(W_f3_back)-angle(W_f3_back(length(W_f3_back))))*10^(6)/(2*pi*13.6*10^(3)),'color','r','linestyle','--')
+plot(data_out(:,1),(angle(W_f3_forw)-angle(W_f3_forw(1)))*10^(6)/(2*pi*10.2*10^(3)),'color','b','linestyle','--')
+plot(data_out(:,1),(angle(W_f3_back)-angle(W_f3_back(end)))*10^(6)/(2*pi*10.2*10^(3))+in_data(T2,7)-in_data(T1,7),'color','r','linestyle','--')
 xlim([data_out(1,1) data_out(end,1)])
 YLim(6,:) = get(gca,'YLim');
 G6 = gca;

@@ -113,7 +113,7 @@ cd D:\VLF_DATABASE\Algorithm2;
 
 % averaging over 3, 7, 9 points with step 100 sec
 average = get(handles.popupmenu_average,'Value');
-in_data = Awaraging(in_data, average);
+[in_data, averageStr] = Aweraging(in_data, average);
 
 %лишние отсчеты убираются, чтобы обеспечить выбранный временной шаг
 step = get(handles.popupmenu_step,'Value');
@@ -351,7 +351,7 @@ newfilename = strrep(filename, '_DATA.xls', '_RESULT.xls');
 set(handles.save_txt,'String',newfilename)
 
 GraphsResult(data_out, stepStr, units)
-GraphsComparison(T1, T2, in_data, data_out, GG, stepStr, units)
+GraphsComparison(T1, T2, in_data, data_out, GG, stepStr, averageStr, units)
 
 function R1_minimize_Callback(hObject, eventdata, handles)
 % hObject    handle to R1_minimize (see GCBO)
