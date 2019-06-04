@@ -38,5 +38,7 @@ xlabel('UT, hours')
 ylabel('Effictive height h, km')
 legend('positive direction of time', 'negative direction of time')
 
+saveas(gcf,'result.fig')
+saveas(gcf,'result.png')
 end
 

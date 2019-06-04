@@ -142,4 +142,6 @@ set(G4,'YLim',ylim2)
 set(G5,'YLim',ylim2)
 set(G6,'YLim',ylim2)
 
+saveas(gcf,'comp.fig')
+saveas(gcf,'comp.png')
 end
