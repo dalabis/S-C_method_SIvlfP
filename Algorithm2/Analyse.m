@@ -167,6 +167,8 @@ switch step
         stepStr = '30 min';
 end
 
+TT = 1;
+
 for ii = 1:length(t)-1
     
     x = fix((R2_minimize - R1_minimize)/dR_minimize+1);
@@ -323,22 +325,21 @@ for ii = 1:length(t)-1
     R2 = R2(end:-1:1);
     h2 = h2(end:-1:1);
     
-    Data_out = get(handles.result_table,'Data');
-    Data_out(T1:T2,1:5) = [in_data(T1:T2,1),R1',h1',R2',h2'];
+    %Data_out = get(handles.result_table,'Data');
+    data_out((TT-1)+(1:(T2-T1+1)),1:5) = [in_data(T1:T2,1),R1',h1',R2',h2'];
+    TT = TT + T2-T1+1;
     
-    set(handles.result_table,'Data',Data_out)
+    %set(handles.result_table,'Data',Data_out)
 end
 
-data_out = get(handles.result_table,'Data');
+%data_out = get(handles.result_table,'Data');
 
+%i = 1;
+%while data_out(i,2:5) == [0;0;0;0]
+%    i = i+1;
+%end
 
-
-i = 1;
-while data_out(i,2:5) == [0,0,0,0]
-    i = i+1;
-end
-
-data_out = data_out(i:size(data_out,1),:);
+%data_out = data_out(i:size(data_out,1),:);
 
 [~,T1] = min(abs(in_data(:,1)-t(1)));
 [~,T2] = min(abs(in_data(:,1)-t(length(t))));
