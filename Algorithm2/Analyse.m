@@ -22,7 +22,7 @@ function varargout = Analyse(varargin)
 
 % Edit the above text to modify the response to help Analyse
 
-% Last Modified by GUIDE v2.5 24-May-2019 14:20:41
+% Last Modified by GUIDE v2.5 18-Jun-2019 22:26:50
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -173,23 +173,20 @@ for ii = 1:length(t)-1
     
     x = fix((R2_minimize - R1_minimize)/dR_minimize+1);
     y = fix((h2_minimize - h1_minimize)/dh_minimize+1);
-
-    G1(1:x, 1:y) = 0;
     
     [~,T1] = min(abs(in_data(:,1)-t(ii)));
     [~,T2] = min(abs(in_data(:,1)-t(ii+1)));
     B = in_data(T1:T2,2:7);
     
     for jj = 1:2
-        
         if jj == 2
             B = B(end:-1:1,:);
         end
         
         Algorithm = get(handles.graph_menu,'Value');
+        G1(1:x,1:y) = 0;
         
         if Algorithm == 1
-        
             for k = 1:x
                 for m = 1:y
                     R0 = R1_minimize + dR_minimize*(k-1);
@@ -198,9 +195,7 @@ for ii = 1:length(t)-1
                     G1(k,m) = sum(S);
                 end
             end
-            
         elseif Algorithm == 2
-            
             for k = 1:x
                 for m = 1:y
                     R0 = R1_minimize + dR_minimize*(k-1);
@@ -209,9 +204,7 @@ for ii = 1:length(t)-1
                     G1(k,m) = sum(S);
                 end
             end
-            
         elseif Algorithm == 3
-            
             for k = 1:x
                 for m = 1:y
                     R0 = R1_minimize + dR_minimize*(k-1);
@@ -220,9 +213,7 @@ for ii = 1:length(t)-1
                     G1(k,m) = sum(S);
                 end
             end
-            
         elseif Algorithm == 4
-            
             for k = 1:x
                 for m = 1:y
                     R0 = R1_minimize + dR_minimize*(k-1);
@@ -231,9 +222,17 @@ for ii = 1:length(t)-1
                     G1(k,m) = sum(S);
                 end
             end
-            
+        elseif Algorithm == 5
+            for k = 1:x
+                for m = 1:y
+                    R0 = R1_minimize + dR_minimize*(k-1);
+                    h0 = h1_minimize + dh_minimize*(m-1);
+                    [~, ~, S] = Z_result_3(R0, h0, B, 0);
+                    G1(k,m) = min([sum(S(:,1)); sum(S(:,2)); sum(S(:,3))]);
+                end
+            end
         end
-    
+        
         axes(handles.discrepancy_funcion)
         imagesc(G1, [min(G1(:)) min(G1(:))*20])
         set(gca,'XTickLabel',arrayfun(@num2str, h1_minimize+(get(gca,'XTick')-1)*dh_minimize,'UniformOutput',false))
@@ -302,12 +301,20 @@ for ii = 1:length(t)-1
         elseif Algorithm == 2
             
             if jj == 1
-                [R1, h1, ~] = Z_leastsquare(R0, h0, B, 0);
+                [R1, h1, ~] = Z_third_hop(R0, h0, B, 0);
             else
-                [R2, h2, ~] = Z_leastsquare(R0, h0, B, 0);
+                [R2, h2, ~] = Z_third_hop(R0, h0, B, 0);
             end
             
         elseif Algorithm == 3
+            
+            if jj == 1
+                [R1, h1, ~] = Z_leastsquare(R0, h0, B, 0);
+            else
+                [R2, h2, ~] = Z_leastsquare(R0, h0, B, 0);
+        end
+            
+        elseif Algorithm == 4
             
             if jj == 1
                 [R1, h1, ~] = Z_Algorithm_2(R0, h0, B, 0);
@@ -315,44 +322,57 @@ for ii = 1:length(t)-1
                 [R2, h2, ~] = Z_Algorithm_2(R0, h0, B, 0);
             end
             
+        elseif Algorithm == 5
+            
+            if jj == 1
+                [R1, h1, SS] = Z_result_3(R0, h0, B, 0);
+            else
+                [R2, h2, SS] = Z_result_3(R0, h0, B, 0);
+            end
+            
         end
         
         % This variable is needed to transfer the value of the penalty...
         % function to the function that builds the graph
-        GG(jj) = G1(i,j);
+        if Algorithm == 5
+            GG(jj,1:3) = sum(SS);
+        else
+            GG(jj) = G1(i,j);
+        end
     end
     
-    R2 = R2(end:-1:1);
-    h2 = h2(end:-1:1);
-    
-    %Data_out = get(handles.result_table,'Data');
-    data_out((TT-1)+(1:(T2-T1+1)),1:5) = [in_data(T1:T2,1),R1',h1',R2',h2'];
+    if Algorithm == 5
+        R2 = R2(end:-1:1,:);
+        h2 = h2(end:-1:1,:);
+        
+        data_out((TT-1)+(1:(T2-T1+1)),:) = [in_data(T1:T2,1),R1(:,1),h1(:,1),R2(:,1),h2(:,1),...
+            R1(:,2),h1(:,2),R2(:,2),h2(:,2),R1(:,3),h1(:,3),R2(:,3),h2(:,3)];
+    else
+        R2 = R2(end:-1:1);
+        h2 = h2(end:-1:1);
+        
+        data_out((TT-1)+(1:(T2-T1+1)),:) = [in_data(T1:T2,1),R1',h1',R2',h2'];
+    end
     TT = TT + T2-T1+1;
-    
-    %set(handles.result_table,'Data',Data_out)
 end
-
-%data_out = get(handles.result_table,'Data');
-
-%i = 1;
-%while data_out(i,2:5) == [0;0;0;0]
-%    i = i+1;
-%end
-
-%data_out = data_out(i:size(data_out,1),:);
 
 [~,T1] = min(abs(in_data(:,1)-t(1)));
 [~,T2] = min(abs(in_data(:,1)-t(length(t))));
-%data_out(:,6:11) = in_data(T1:T2,2:7);
 
 set(handles.result_table,'Data',data_out)
 
-%предложить имя файла для сохранения, идентичное исходному
+% automaticaly set the name of the file with the result
 newfilename = strrep(filename, '_DATA.xls', '_RESULT.xls');
 set(handles.save_txt,'String',newfilename)
 
-GraphsResult(data_out, stepStr, units)
-GraphsComparison(T1, T2, in_data, data_out, GG, stepStr, averageStr, units)
+GraphsResult(data_out, stepStr, units, Algorithm)
+if Algorithm == 5
+    GraphsComparison(T1, T2, in_data, data_out(:,[1;2;3;4;5]), GG(:,1), stepStr, averageStr, units)
+    GraphsComparison(T1, T2, in_data, data_out(:,[1;6;7;8;9]), GG(:,2), stepStr, averageStr, units)
+    GraphsComparison(T1, T2, in_data, data_out(:,[1;10;11;12;13]), GG(:,3), stepStr, averageStr, units)
+else
+    GraphsComparison(T1, T2, in_data, data_out, GG, stepStr, averageStr, units)
+end
 
 function R1_minimize_Callback(hObject, eventdata, handles)
 % hObject    handle to R1_minimize (see GCBO)
@@ -655,7 +675,7 @@ function save_btn_Callback(hObject, eventdata, handles)
 filename = get(handles.save_txt,'String');
 out_data = get(handles.result_table,'Data');
 delete(filename);
-xlswrite(filename,out_data(:,1:5))
+xlswrite(filename,out_data)
 
 
 % --- Executes on button press in search.
