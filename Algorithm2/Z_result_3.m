@@ -93,13 +93,13 @@ function [R, h, S] = Z_result_3(R0, h0, B, dis)
             R(m+1,n) = R(m,n) + DeltaR;
             h(m+1,n) = h(m,n) + Deltah;
         end
-
-        for j =1:3
-            SE(j) = abs(a(j) * abs(W(j, R(u,n), h(u,n), dis)) - B(u, j))^2 / abs(B(1, j))^2;
-            Sphi(j) = abs(c(j) + angle(W(j, R(u,n), h(u,n), dis)) + AAA(j)*2*pi - B(u, j+3) * omega(j)*10^(-6))^2 / ...
-                ((B(1, j+3) - B(u, j+3)) * omega(j)*10^(-6))^2;
-            s(j) = SE(j) + Sphi(j);
-        end
+    end
+    
+    for j =1:3
+        SE(j) = abs(a(j) * abs(W(j, R(u,n), h(u,n), dis)) - B(u, j))^2 / abs(B(1, j))^2;
+        Sphi(j) = abs(c(j) + angle(W(j, R(u,n), h(u,n), dis)) + AAA(j)*2*pi - B(u, j+3) * omega(j)*10^(-6))^2 / ...
+            ((B(1, j+3) - B(u, j+3)) * omega(j)*10^(-6))^2;
+        s(j) = SE(j) + Sphi(j);
     end
 
     S(u,n) = S(u-1,n) + s(1) + s(2) + s(3);
