@@ -48,7 +48,7 @@ function [R, h, S] = Z(R0, h0, B, dis)
             vv(j) = modWh(j, R(m), h(m), dis) / abs(W(j, R(m), h(m), dis));
             SE(j) = abs(a(j) * abs(W(j, R(m), h(m), dis)) - B(m, j))^2 / abs(B(1, j))^2;
             Sphi(j) = abs(c(j) + angle(W(j, R(m), h(m), dis)) + AAA(j)*2*pi - B(m, j+3) * omega(j)*10^(-6))^2 / ...
-                ((B(1, j+3) - B(u, j+3)) * omega(j)*10^(-6))^2;
+                ((max(B(:, j+3)) - min(B(:, j+3))) * omega(j)*10^(-6))^2;
             s(j) = SE(j) + Sphi(j);
             for k = 1:3
                 V(k) = argWR(k, R(m), h(m), dis);
@@ -83,7 +83,7 @@ function [R, h, S] = Z(R0, h0, B, dis)
 
         SE(j) = abs(a(j) * abs(W(j, R(u), h(u), dis)) - B(u, j))^2 / abs(B(1, j))^2;
         Sphi(j) = abs(c(j) + angle(W(j, R(u), h(u), dis)) + AAA(j)*2*pi - B(u, j+3) * omega(j)*10^(-6))^2 / ...
-            ((B(1, j+3) - B(u, j+3)) * omega(j)*10^(-6))^2;
+            ((max(B(:, j+3)) - min(B(:, j+3))) * omega(j)*10^(-6))^2;
         s(j) = SE(j) + Sphi(j);
     end
 
