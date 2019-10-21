@@ -37,30 +37,40 @@ function [R, h, S] = Z_result_3(R0, h0, B, dis)
             for j = 1:3
                 %проверка перехода фазы через начало отсчета, в случае прохождения
                 %обеспечивается неразрывность путем прибавления 2Пи либо -2Пи
-                if m > 1
-                    if abs(angle(W(j, R(m,n), h(m,n), dis)) - angle(W(j, R(m-1,n), h(m-1,n), dis))) ...
-                            > abs(angle(W(j, R(m,n), h(m,n), dis)) - angle(W(j, R(m-1,n), h(m-1,n), dis)) + 2*pi)
-                        AAA(j) = AAA(j)+1;
-                    elseif abs(angle(W(j, R(m,n), h(m,n), dis)) -angle(W(j, R(m-1,n), h(m-1,n), dis))) ...
-                            > abs(angle(W(j, R(m,n), h(m,n), dis)) -angle(W(j, R(m-1,n), h(m-1,n), dis)) - 2*pi)
-                        AAA(j) = AAA(j)-1;
-                    end
-                end
+                %if m > 1
+                %    if abs(angle(W(j, R(m,n), h(m,n), dis)) - angle(W(j, R(m-1,n), h(m-1,n), dis))) ...
+                %            > abs(angle(W(j, R(m,n), h(m,n), dis)) - angle(W(j, R(m-1,n), h(m-1,n), dis)) + 2*pi)
+                %        AAA(j) = AAA(j)+1;
+                %    elseif abs(angle(W(j, R(m,n), h(m,n), dis)) -angle(W(j, R(m-1,n), h(m-1,n), dis))) ...
+                %            > abs(angle(W(j, R(m,n), h(m,n), dis)) -angle(W(j, R(m-1,n), h(m-1,n), dis)) - 2*pi)
+                %        AAA(j) = AAA(j)-1;
+                %    end
+                %end
 
                 v(j) = modWR(j, R(m,n), h(m,n), dis) / abs(W(j, R(m,n), h(m,n), dis));
                 vv(j) = modWh(j, R(m,n), h(m,n), dis) / abs(W(j, R(m,n), h(m,n), dis));
-                SE(j) = abs(a(j) * abs(W(j, R(m,n), h(m,n), dis)) - B(m, j))^2 / abs(B(1, j))^2;
-                Sphi(j) = abs(c(j) + angle(W(j, R(m,n), h(m,n), dis)) + AAA(j)*2*pi - B(m, j+3) * omega(j)*10^(-6))^2 / ...
+                SE(j) = (a(j) * abs(W(j, R(m,n), h(m,n), dis)) - B(m, j))^2 / (B(1, j))^2;
+                Sphi(j) = (c(j) + angle(W(j, R(m,n), h(m,n), dis)) + AAA(j)*2*pi - B(m, j+3) * omega(j)*10^(-6))^2 / ...
                     ((max(B(:, j+3)) - min(B(:, j+3))) * omega(j)*10^(-6))^2;
                 s(j) = SE(j) + Sphi(j);
                 for k = 1:3
                     V(k) = argWR(k, R(m,n), h(m,n), dis);
                     VV(k) = argWh(k, R(m,n), h(m,n), dis);
+                end
+            end
+            
+            del1 = find(abs(v) == min(abs(v)));
+            del2 = find(abs(vv) == min(abs(vv)));
+            v(del1) = 0;
+            vv(del2) = 0;
+            
+            for j = 1:3
+                for k = 1:3
                     A = [v(j), vv(j); V(k), VV(k)];
                     C(j, k) = abs(det(A));
                 end
             end
-
+            
             % finding first maximal determinant for n = 1
             % second maximal determinant for n = 2
             % third maximal determinant for n = 3
@@ -96,8 +106,8 @@ function [R, h, S] = Z_result_3(R0, h0, B, dis)
     end
     
     for j =1:3
-        SE(j) = abs(a(j) * abs(W(j, R(u,n), h(u,n), dis)) - B(u, j))^2 / abs(B(1, j))^2;
-        Sphi(j) = abs(c(j) + angle(W(j, R(u,n), h(u,n), dis)) + AAA(j)*2*pi - B(u, j+3) * omega(j)*10^(-6))^2 / ...
+        SE(j) = (a(j) * abs(W(j, R(u,n), h(u,n), dis)) - B(u, j))^2 / (B(1, j))^2;
+        Sphi(j) = (c(j) + angle(W(j, R(u,n), h(u,n), dis)) + AAA(j)*2*pi - B(u, j+3) * omega(j)*10^(-6))^2 / ...
             ((max(B(:, j+3)) - min(B(:, j+3))) * omega(j)*10^(-6))^2;
         s(j) = SE(j) + Sphi(j);
     end

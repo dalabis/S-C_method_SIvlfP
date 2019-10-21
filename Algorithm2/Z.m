@@ -36,18 +36,18 @@ function [R, h, S] = Z(R0, h0, B, dis)
 
             %проверка перехода фазы через начало отсчета, в случае прохождения
             %обеспечивается неразрывность путем прибавления 2Пи либо -2Пи
-            if m>1
-            if abs(angle(W(j, R(m), h(m), dis)) -angle(W(j, R(m-1), h(m-1), dis))) > abs(angle(W(j, R(m), h(m), dis)) -angle(W(j, R(m-1), h(m-1), dis)) +2*pi)
-                AAA(j) = AAA(j)+1;
-            elseif abs(angle(W(j, R(m), h(m), dis)) -angle(W(j, R(m-1), h(m-1), dis))) > abs(angle(W(j, R(m), h(m), dis)) -angle(W(j, R(m-1), h(m-1), dis)) -2*pi)
-                AAA(j) = AAA(j)-1;
-            end
-            end
+            %if m>1
+            %    if abs(angle(W(j, R(m), h(m), dis)) -angle(W(j, R(m-1), h(m-1), dis))) > abs(angle(W(j, R(m), h(m), dis)) -angle(W(j, R(m-1), h(m-1), dis)) +2*pi)
+            %        AAA(j) = AAA(j)+1;
+            %    elseif abs(angle(W(j, R(m), h(m), dis)) -angle(W(j, R(m-1), h(m-1), dis))) > abs(angle(W(j, R(m), h(m), dis)) -angle(W(j, R(m-1), h(m-1), dis)) -2*pi)
+            %        AAA(j) = AAA(j)-1;
+            %    end
+            %end
 
             v(j) = modWR(j, R(m), h(m), dis) / abs(W(j, R(m), h(m), dis));
             vv(j) = modWh(j, R(m), h(m), dis) / abs(W(j, R(m), h(m), dis));
-            SE(j) = abs(a(j) * abs(W(j, R(m), h(m), dis)) - B(m, j))^2 / abs(B(1, j))^2;
-            Sphi(j) = abs(c(j) + angle(W(j, R(m), h(m), dis)) + AAA(j)*2*pi - B(m, j+3) * omega(j)*10^(-6))^2 / ...
+            SE(j) = (a(j) * abs(W(j, R(m), h(m), dis)) - B(m, j))^2 / (B(1, j))^2;
+            Sphi(j) = (c(j) + angle(W(j, R(m), h(m), dis)) + AAA(j)*2*pi - B(m, j+3) * omega(j)*10^(-6))^2 / ...
                 ((max(B(:, j+3)) - min(B(:, j+3))) * omega(j)*10^(-6))^2;
             s(j) = SE(j) + Sphi(j);
             for k = 1:3
@@ -78,11 +78,19 @@ function [R, h, S] = Z(R0, h0, B, dis)
         h(m+1) = h(m) + Deltah;
 
     end
-
+    
+    m = u;
     for j =1:3
-
-        SE(j) = abs(a(j) * abs(W(j, R(u), h(u), dis)) - B(u, j))^2 / abs(B(1, j))^2;
-        Sphi(j) = abs(c(j) + angle(W(j, R(u), h(u), dis)) + AAA(j)*2*pi - B(u, j+3) * omega(j)*10^(-6))^2 / ...
+        %if m>1
+        %    if abs(angle(W(j, R(m), h(m), dis)) -angle(W(j, R(m-1), h(m-1), dis))) > abs(angle(W(j, R(m), h(m), dis)) -angle(W(j, R(m-1), h(m-1), dis)) +2*pi)
+        %        AAA(j) = AAA(j)+1;
+        %    elseif abs(angle(W(j, R(m), h(m), dis)) -angle(W(j, R(m-1), h(m-1), dis))) > abs(angle(W(j, R(m), h(m), dis)) -angle(W(j, R(m-1), h(m-1), dis)) -2*pi)
+        %        AAA(j) = AAA(j)-1;
+        %    end
+        %end
+        
+        SE(j) = (a(j) * abs(W(j, R(u), h(u), dis)) - B(u, j))^2 / (B(1, j))^2;
+        Sphi(j) = (c(j) + angle(W(j, R(u), h(u), dis)) + AAA(j)*2*pi - B(u, j+3) * omega(j)*10^(-6))^2 / ...
             ((max(B(:, j+3)) - min(B(:, j+3))) * omega(j)*10^(-6))^2;
         s(j) = SE(j) + Sphi(j);
     end
